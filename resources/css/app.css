@@ -1,0 +1,21 @@
+/* Variabel CSS Global */
+:root {
+    --color-light: #E4E0E1;
+    --color-beige: #D6C0B3;
+    --color-brown: #AB886D;
+    --color-dark: #493628;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Import font dan reset dasar */
+@import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}

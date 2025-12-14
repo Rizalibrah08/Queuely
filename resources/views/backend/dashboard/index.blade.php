@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AntriUMKM - Sistem Antrian Online UMKM</title>
+    
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome untuk ikon -->
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
     <style>
         :root {
             --color-light: #E4E0E1;
@@ -442,6 +446,7 @@
             font-weight: 600;
         }
         
+        /* STATUS HANYA BUKA/TUTUP */
         .place-status {
             background-color: var(--color-light);
             color: var(--color-dark);
@@ -450,11 +455,18 @@
             font-size: 0.85rem;
             font-weight: 600;
             margin-top: 5px;
+            text-align: center;
+            min-width: 70px;
         }
         
         .place-status.open {
             background-color: #d4edda;
             color: #155724;
+        }
+        
+        .place-status.closed {
+            background-color: #f8d7da;
+            color: #721c24;
         }
         
         .place-promo-section {
@@ -567,51 +579,6 @@
             background-color: var(--color-brown);
         }
         
-        /* Footer Sticky dengan Ikon */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: white;
-            border-top: 1px solid var(--color-light);
-            padding: 10px 0;
-            z-index: 1000;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .nav-icons {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-        
-        .nav-icon {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: var(--color-dark);
-            transition: all 0.3s;
-            padding: 5px 10px;
-            border-radius: 8px;
-        }
-        
-        .nav-icon:hover, .nav-icon.active {
-            color: var(--color-brown);
-            background-color: var(--color-light);
-        }
-        
-        .nav-icon i {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-        }
-        
-        .nav-icon span {
-            font-size: 0.7rem;
-            font-weight: 500;
-        }
-        
         /* Responsif */
         @media (max-width: 768px) {
             .promo-banner {
@@ -649,10 +616,6 @@
             
             .location-btn strong {
                 margin-left: 5px;
-            }
-            
-            .nav-icon span {
-                font-size: 0.65rem;
             }
         }
         
@@ -702,14 +665,6 @@
             .promo-item-image {
                 height: 100px;
             }
-            
-            .nav-icon i {
-                font-size: 1.3rem;
-            }
-            
-            .nav-icon span {
-                font-size: 0.6rem;
-            }
         }
         
         /* Efek untuk sticky search bar */
@@ -747,7 +702,7 @@
     <div class="container-fluid top-header">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
-                <a href="#" class="logo">Antri<span>UMKM</span></a>
+                <a href="{{ route('dashboard.index') }}" class="logo">Queue<span>ly</span></a>
                 <button class="location-btn">
                     <i class="fas fa-map-marker-alt"></i>
                     <span>Lokasi:</span>
@@ -890,7 +845,7 @@
                     <div class="place-info">
                         <div class="place-name">
                             <div>KFC - PASARAYA MANGGARAI</div>
-                            <div class="place-status open">BUKA • Antrian: 8</div>
+                            <div class="place-status open">BUKA</div>
                         </div>
                         <div class="place-location">
                             <i class="fas fa-map-marker-alt"></i>
@@ -951,7 +906,7 @@
                     <div class="place-info">
                         <div class="place-name">
                             <div>Warung Makan Sederhana</div>
-                            <div class="place-status open">BUKA • Antrian: 12</div>
+                            <div class="place-status open">BUKA</div>
                         </div>
                         <div class="place-location">
                             <i class="fas fa-map-marker-alt"></i>
@@ -1012,7 +967,7 @@
                     <div class="place-info">
                         <div class="place-name">
                             <div>Kopi Teman Sejati</div>
-                            <div class="place-status open">BUKA • Antrian: 5</div>
+                            <div class="place-status open">BUKA</div>
                         </div>
                         <div class="place-location">
                             <i class="fas fa-map-marker-alt"></i>
@@ -1063,37 +1018,73 @@
                     <button class="visit-btn-new">Lihat Antrian & Menu</button>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Footer Sticky dengan Ikon Navigasi -->
-    <div class="bottom-nav">
-        <div class="container">
-            <div class="nav-icons">
-                <a href="#" class="nav-icon active">
-                    <i class="fas fa-home"></i>
-                    <span>Beranda</span>
-                </a>
-                <a href="#" class="nav-icon">
-                    <i class="fas fa-tv"></i>
-                    <span>Video</span>
-                </a>
-                <a href="#" class="nav-icon">
-                    <i class="fas fa-qrcode"></i>
-                    <span>Scan QR</span>
-                </a>
-                <a href="#" class="nav-icon">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span>Pesanan</span>
-                </a>
-                <a href="#" class="nav-icon">
-                    <i class="fas fa-user"></i>
-                    <span>Profil</span>
-                </a>
+            
+            <!-- Tempat 4 - Martabak Manis 89 (Contoh TUTUP) -->
+            <div class="place-card-new mb-4" data-category="snack">
+                <div class="place-header">
+                    <div class="place-logo">
+                        <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80" alt="Martabak Logo">
+                    </div>
+                    <div class="place-info">
+                        <div class="place-name">
+                            <div>Martabak Manis 89</div>
+                            <div class="place-status closed">TUTUP</div>
+                        </div>
+                        <div class="place-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Jl. Sudirman No. 123, Jakarta Selatan
+                        </div>
+                        <div class="place-category">Martabak</div>
+                    </div>
+                </div>
+                
+                <div class="place-promo-section">
+                    <div class="promo-title">Menu Spesial</div>
+                    <div class="promo-items">
+                        <div class="promo-item">
+                            <img src="https://images.unsplash.com/photo-1565299507177-b0ac66763828?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80" class="promo-item-image" alt="Martabak Coklat Keju">
+                            <div class="promo-item-content">
+                                <div class="promo-item-name">Martabak Coklat Keju</div>
+                                <div class="promo-item-price">Rp 45.000</div>
+                            </div>
+                        </div>
+                        
+                        <div class="promo-item">
+                            <img src="https://images.unsplash.com/photo-1565299632130-7c3c5c1d6c9d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80" class="promo-item-image" alt="Martabak Kacang">
+                            <div class="promo-item-content">
+                                <div class="promo-item-name">Martabak Kacang</div>
+                                <div class="promo-item-price">Rp 40.000</div>
+                            </div>
+                        </div>
+                        
+                        <div class="promo-item">
+                            <img src="https://images.unsplash.com/photo-1565299507176-7c6d2c4875c9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=300&q=80" class="promo-item-image" alt="Martabak Special">
+                            <div class="promo-item-content">
+                                <div class="promo-item-name">Martabak Special</div>
+                                <div class="promo-item-price">Rp 55.000 <span class="promo-item-old-price">Rp 65.000</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="place-footer">
+                    <a href="#" class="view-outlets">
+                        View more menu >
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    <div class="place-distance">≈ 2.1 km</div>
+                </div>
+                
+                <div style="padding: 0 15px 15px 15px;">
+                    <button class="visit-btn-new">Lihat Menu</button>
+                </div>
             </div>
         </div>
     </div>
-
+    
+    <!-- INCLUDE FOOTER -->
+    @include('components.bottom-nav')
+    
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     
