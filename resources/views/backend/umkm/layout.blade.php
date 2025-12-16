@@ -283,6 +283,14 @@
                 </li>
 
                 <li class="nav-item">
+                    <a href="{{ route('umkm.videos.index') }}"
+                        class="nav-link @if(Route::is('umkm.videos.*')) active @endif">
+                        <i class="fas fa-video"></i>
+                        <span>Video / Shorts</span>
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a href="{{ route('umkm.orders.index') }}"
                         class="nav-link @if(Route::is('umkm.orders.index')) active @endif">
                         <i class="fas fa-receipt"></i>

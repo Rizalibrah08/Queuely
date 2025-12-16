@@ -25,6 +25,7 @@ Route::prefix('videos')->group(function () {
 // QR Routes
 Route::prefix('qr')->group(function () {
     Route::get('/scan', [QRController::class, 'scan'])->name('qr.scan');
+    Route::post('/verify', [QRController::class, 'verify'])->name('qr.verify');
 });
 
 // Order Routes
@@ -73,6 +74,14 @@ Route::prefix('umkm')->middleware('auth')->group(function () {
         Route::get('/', [UmkmOrderController::class, 'index'])->name('index');
         Route::get('/history', [UmkmOrderController::class, 'history'])->name('history');
         Route::put('/{id}/status', [UmkmOrderController::class, 'updateStatus'])->name('update-status');
+    });
+
+    // Video Management Routes (UMKM Side)
+    Route::prefix('videos')->name('umkm.videos.')->group(function () {
+        Route::get('/', [App\Http\Controllers\UmkmVideoController::class, 'index'])->name('index');
+        Route::get('/create', [App\Http\Controllers\UmkmVideoController::class, 'create'])->name('create');
+        Route::post('/', [App\Http\Controllers\UmkmVideoController::class, 'store'])->name('store');
+        Route::delete('/{id}', [App\Http\Controllers\UmkmVideoController::class, 'destroy'])->name('destroy');
     });
 });
 
