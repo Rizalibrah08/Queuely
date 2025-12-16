@@ -67,4 +67,9 @@ class UMKM extends Model
     {
         return $query->where('status', 'rejected');
     }
+
+    public function videos()
+    {
+        return $this->hasMany(Video::class, 'umkm_id');
+    }
 }

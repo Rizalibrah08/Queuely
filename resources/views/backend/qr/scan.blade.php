@@ -891,28 +891,6 @@
             let isScannerActive = false;
             let isFlashOn = false;
 
-            // Dummy UMKM data for simulation
-            const merchantData = {
-                'ANTRI123': {
-                    id: 'UMKM001',
-                    name: 'Warung Makan Sederhana',
-                    type: 'Makanan',
-                    code: 'ANTRI123'
-                },
-                'UMKM456': {
-                    id: 'UMKM002',
-                    name: 'Kopi Teman Sejati',
-                    type: 'Minuman',
-                    code: 'UMKM456'
-                },
-                'QR789': {
-                    id: 'UMKM003',
-                    name: 'KFC - PASARAYA MANGGARAI',
-                    type: 'Fast Food',
-                    code: 'QR789'
-                }
-            };
-
             // Initialize QR Scanner
             function initQRScanner() {
                 // Check if browser supports camera
@@ -1040,7 +1018,7 @@
                 stopScanner();
 
                 // Process the scanned data
-                processScannedData(decodedText);
+                verifyCode(decodedText);
             }
 
             // QR Scan Failure Callback
@@ -1049,53 +1027,56 @@
                 // Don't show error messages for normal operation
             }
 
-            // Process scanned data
-            function processScannedData(data) {
-                let merchant = null;
-
-                // Check if scanned data matches any known merchant code
-                for (const code in merchantData) {
-                    if (data.includes(code) || data === code) {
-                        merchant = merchantData[code];
-                        break;
-                    }
+            // Verify Code with Backend
+            function verifyCode(code) {
+                // Handle URL format if applicable (e.g. https://queuely.com?code=XYZ)
+                try {
+                    const url = new URL(code);
+                    const params = new URLSearchParams(url.search);
+                    const extractedCode = params.get('code') || params.get('umkm') || params.get('id');
+                    if (extractedCode) code = extractedCode;
+                } catch (e) {
+                    // Not a URL, use raw code
                 }
 
-                // If no direct match, try to parse URL
-                if (!merchant) {
-                    try {
-                        const url = new URL(data);
-                        const params = new URLSearchParams(url.search);
-                        const code = params.get('code') || params.get('umkm') || params.get('id');
+                // Show loading state
+                resultMessage.innerHTML = 'Memverifikasi kode...';
+                scanResult.classList.add('show');
 
-                        if (code && merchantData[code]) {
-                            merchant = merchantData[code];
+                fetch('{{ route("qr.verify") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ code: code })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showScanResult(
+                                true,
+                                `Berhasil memindai QR Code untuk <strong>${data.umkm.name}</strong>.`,
+                                data.redirect_url
+                            );
+                        } else {
+                            showScanResult(
+                                false,
+                                `QR Code tidak dikenali.<br>Pastikan Anda memindai QR Code yang valid dari UMKM terdaftar.`
+                            );
                         }
-                    } catch (e) {
-                        // Not a URL, treat as direct code
-                        if (merchantData[data]) {
-                            merchant = merchantData[data];
-                        }
-                    }
-                }
-
-                // Show result
-                if (merchant) {
-                    showScanResult(
-                        true,
-                        `Berhasil memindai QR Code untuk <strong>${merchant.name}</strong>.`,
-                        merchant
-                    );
-                } else {
-                    showScanResult(
-                        false,
-                        `QR Code tidak dikenali. Kode: <strong>${data.substring(0, 20)}...</strong><br>Pastikan Anda memindai QR Code yang valid dari UMKM terdaftar.`
-                    );
-                }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showScanResult(
+                            false,
+                            `Terjadi kesalahan saat memverifikasi kode. Silakan coba lagi.`
+                        );
+                    });
             }
 
             // Show scan result
-            function showScanResult(success, message, merchant = null) {
+            function showScanResult(success, message, redirectUrl = null) {
                 const icon = scanResult.querySelector('.result-icon');
                 const title = scanResult.querySelector('.result-title');
 
@@ -1104,14 +1085,21 @@
                     icon.innerHTML = '<i class="fas fa-check-circle"></i>';
                     title.textContent = 'Berhasil Memindai!';
 
-                    // Store merchant data for navigation
-                    if (merchant) {
-                        goToMerchantBtn.dataset.merchant = JSON.stringify(merchant);
+                    // Store redirect URL
+                    if (redirectUrl) {
+                        goToMerchantBtn.dataset.url = redirectUrl;
+                        goToMerchantBtn.style.display = 'inline-block';
+
+                        // Auto redirect after 1.5 seconds if successful
+                        setTimeout(() => {
+                            window.location.href = redirectUrl;
+                        }, 1500);
                     }
                 } else {
                     icon.className = 'result-icon result-error';
                     icon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
                     title.textContent = 'Gagal Memindai';
+                    goToMerchantBtn.style.display = 'none';
                 }
 
                 resultMessage.innerHTML = message;
@@ -1123,7 +1111,7 @@
 
             // Submit manual code
             function submitManualCode() {
-                const code = codeInput.value.trim().toUpperCase();
+                const code = codeInput.value.trim();
 
                 if (!code) {
                     alert('Masukkan kode unik terlebih dahulu');
@@ -1131,23 +1119,7 @@
                     return;
                 }
 
-                // Check if code exists
-                if (merchantData[code]) {
-                    const merchant = merchantData[code];
-                    showScanResult(
-                        true,
-                        `Kode unik valid untuk <strong>${merchant.name}</strong>.`,
-                        merchant
-                    );
-                } else {
-                    showScanResult(
-                        false,
-                        `Kode <strong>${code}</strong> tidak ditemukan.<br>Pastikan Anda memasukkan kode yang benar dari UMKM.`
-                    );
-                }
-
-                // Clear input
-                codeInput.value = '';
+                verifyCode(code);
             }
 
             // Show permissions info
@@ -1161,19 +1133,9 @@
 
             // Navigate to merchant page
             function goToMerchant() {
-                const merchantDataStr = goToMerchantBtn.dataset.merchant;
-
-                if (merchantDataStr) {
-                    const merchant = JSON.parse(merchantDataStr);
-
-                    // In a real app, you would redirect to merchant page
-                    alert(`Mengarahkan ke halaman: ${merchant.name}\nKode: ${merchant.code}\nID: ${merchant.id}`);
-
-                    // Simulate redirect
-                    setTimeout(() => {
-                        scanResult.classList.remove('show');
-                        stopScanner();
-                    }, 1000);
+                const url = goToMerchantBtn.dataset.url;
+                if (url) {
+                    window.location.href = url;
                 }
             }
 
@@ -1201,9 +1163,6 @@
 
             // Initialize scanner on page load
             initQRScanner();
-
-            // Auto-start scanner (optional)
-            // setTimeout(startScanner, 1000);
         });
     </script>
 </body>
